@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync, existsSync, mkdirSync, rmSync, cpSync, statSync } from 'fs';
+import { readFileSync, readdirSync, existsSync, mkdirSync, rmSync, cpSync, statSync, symlinkSync } from 'fs';
 import { join, basename, resolve, sep, relative } from 'path';
 import { homedir } from 'os';
 import { execSync } from 'child_process';
@@ -262,7 +262,15 @@ async function installSingleLocalSkill(
     process.exit(1);
   }
 
-  cpSync(skillDir, targetPath, { recursive: true, dereference: true });
+  if (existsSync(targetPath)) {
+    rmSync(targetPath, { recursive: true, force: true });
+  }
+
+  if (options.symlink) {
+    symlinkSync(resolve(skillDir), targetPath, 'dir');
+  } else {
+    cpSync(skillDir, targetPath, { recursive: true, dereference: true });
+  }
   writeSkillMetadata(targetPath, buildLocalMetadata(sourceInfo, skillDir));
 
   console.log(chalk.green(`✅ Installed: ${skillName}`));
@@ -475,7 +483,15 @@ async function installFromRepo(
       console.error(chalk.red(`Security error: Installation path outside target directory`));
       continue;
     }
-    cpSync(info.skillDir, info.targetPath, { recursive: true, dereference: true });
+    if (existsSync(info.targetPath)) {
+      rmSync(info.targetPath, { recursive: true, force: true });
+    }
+
+    if (options.symlink) {
+      symlinkSync(resolve(info.skillDir), info.targetPath, 'dir');
+    } else {
+      cpSync(info.skillDir, info.targetPath, { recursive: true, dereference: true });
+    }
     writeSkillMetadata(info.targetPath, buildMetadataFromSource(sourceInfo, info.skillDir, repoDir));
 
     console.log(chalk.green(`✅ Installed: ${info.skillName}`));

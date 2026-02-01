@@ -211,7 +211,42 @@ Skills are **loaded on demand**, keeping your agent's context clean and focused.
 
 ---
 
-## 🧪 Creating Your Own Skills
+## Why CLI Instead of MCP?
+
+**MCP (Model Context Protocol)** is Anthropic's protocol for connecting AI to external tools and data sources. It's great for:
+- Database connections
+- API integrations
+- Real-time data fetching
+- External service integration
+
+**Skills (SKILL.md format)** are different — they're for:
+- Specialized workflows (PDF manipulation, spreadsheet editing)
+- Bundled resources (scripts, templates, references)
+- Progressive disclosure (load instructions only when needed)
+- Static, reusable patterns
+
+**Why not implement skills via MCP?**
+
+1. **Skills are static instructions, not dynamic tools**
+   MCP is for server-client connections. Skills are markdown files with instructions.
+
+2. **No server needed**
+   Skills are just files. MCP requires running servers.
+
+3. **Universal compatibility**
+   CLI works with any agent (Claude Code, Cursor, Windsurf, Aider). MCP requires MCP support.
+
+4. **Follows Anthropic's design**
+   Anthropic created skills as SKILL.md files, not MCP servers. We're implementing their spec.
+
+5. **Simpler for users**
+   `openskills install anthropics/skills` vs "configure MCP server, set up authentication, manage server lifecycle"
+
+**MCP and skills solve different problems.** OpenSkills implements Anthropic's skills spec (SKILL.md format) the way it was designed — as progressively-loaded markdown instructions.
+
+---
+
+## Claude Code Compatibility
 
 ### Minimal Structure
 
@@ -238,11 +273,32 @@ npx openskills install ./my-skill
 
 ### Local Development with Symlinks
 
+For active skill development, use the `--symlink` (or `-s`) flag. This creates a symbolic link in the target directory pointing back to your source code.
+
 ```bash
 git clone git@github.com:your-org/my-skills.git ~/dev/my-skills
 mkdir -p .claude/skills
 ln -s ~/dev/my-skills/my-skill .claude/skills/my-skill
 ```
+
+Or use the `--symlink` flag:
+
+```bash
+# Install a local skill as a symlink
+openskills install ~/dev/my-skills/my-skill --symlink
+
+# Now changes to ~/dev/my-skills/my-skill are immediately reflected
+openskills list  # Shows my-skill
+openskills sync  # Includes my-skill in AGENTS.md
+```
+
+**Benefits:**
+- ✅ **Live Updates**: Changes in your source directory are reflected instantly.
+- ✅ **Version Control**: Keep your skills in a dedicated repo while using them across projects.
+- ✅ **No Duplication**: Avoid manual copying when updating skills.
+
+> [!NOTE]
+> **Conflict Resolution**: If a physical directory already exists at the target location, `openskills` will (with your confirmation, or automatically with `-y`) delete the existing folder and replace it with a symbolic link.
 
 ### Authoring Guide
 
