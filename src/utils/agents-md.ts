@@ -45,6 +45,14 @@ How to use skills:
 - The skill content will load with detailed instructions on how to complete the task
 - Base directory provided in output for resolving bundled resources (references/, scripts/, assets/)
 
+Skill locations:
+- \`project\` - Skills stored in the current project directory:
+  - \`./.agent/skills/\` (when using --universal flag)
+  - \`./.claude/skills/\` (default)
+- \`global\` - Skills stored in your home directory:
+  - \`~/.agent/skills/\` (when using --universal flag)
+  - \`~/.claude/skills/\` (default)
+
 Usage notes:
 - Only use skills listed in <available_skills> below
 - Do not invoke a skill that is already loaded in your context

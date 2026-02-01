@@ -47,6 +47,22 @@ describe('sync utilities (agents-md.ts)', () => {
       expect(xml).toContain('</usage>');
     });
 
+    it('should include skill locations documentation', () => {
+      const skills: Skill[] = [
+        { name: 'test', description: 'Test skill', location: 'project', path: '/path' },
+      ];
+
+      const xml = generateSkillsXml(skills);
+
+      expect(xml).toContain('Skill locations:');
+      expect(xml).toContain('`project`');
+      expect(xml).toContain('`global`');
+      expect(xml).toContain('./.agent/skills/');
+      expect(xml).toContain('./.claude/skills/');
+      expect(xml).toContain('~/.agent/skills/');
+      expect(xml).toContain('~/.claude/skills/');
+    });
+
     it('should generate empty skills section for empty array', () => {
       const xml = generateSkillsXml([]);
 
